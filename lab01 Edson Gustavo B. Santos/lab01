@@ -1,0 +1,80 @@
+#include <iostream>
+#include <vector>
+#include <fstream>
+
+using namespace std;
+
+struct Registro
+{
+    int matricula;
+    int idade;
+    float media;
+};
+
+int main() {
+
+int matriculaBusca;
+
+vector <Registro> registros;
+
+    registros.push_back({1, 20, 8.5});
+    registros.push_back({2, 22, 7.8});
+    registros.push_back({3, 19, 9.2});
+    registros.push_back({4, 21, 6.7});
+    registros.push_back({5, 23, 8.9});
+    
+    ofstream arquivo("alunos.bin", ios::binary);
+
+    if(!arquivo){
+        cout<< "Erro ao abrir o arquivo." << endl;
+        return 1;
+    }
+
+    for(const Registro& registro : registros){
+        arquivo.write(reinterpret_cast<const char*>(&registro), sizeof registro);
+    }
+    arquivo.close();
+
+
+    vector <Registro> registrosLidos;
+
+    ifstream arquivoLeitura("alunos.bin", ios::binary);
+
+    if(!arquivoLeitura){
+        cout<< "Erro ao abrir o arquivo para leitura" <<endl;
+        return 1;
+    }
+
+    Registro registro;
+
+    while(arquivoLeitura.read(reinterpret_cast<char*>(&registro),sizeof registro)){
+            registrosLidos.push_back(registro);
+    }
+
+    cout << "Registros lidos: " << registrosLidos.size() << endl;
+
+    arquivoLeitura.close();
+
+    cout <<"Digite a matricula: ";
+    cin >> matriculaBusca;
+
+    bool encontrado = false;
+
+    for(const Registro& registro : registrosLidos){
+        if(registro.matricula == matriculaBusca){
+            cout << "Matricula encontrada" << endl;
+            cout << "Matricula:" << registro.matricula << endl;
+            cout << "Matricula:" << registro.idade << endl;
+            cout << "Matricula:" << registro.media << endl;
+
+            encontrado = true;
+            break;
+        }
+    }
+
+    if(!encontrado){
+        cout << "Matricula nao encontrada." << endl;
+    }
+
+    return 0;
+}
